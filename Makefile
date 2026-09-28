@@ -1,7 +1,7 @@
 # Test targets for each stage. Output is kept short for a projector.
 PY      := .venv/bin/python
 PYTEST  := .venv/bin/pytest
-SHORT   := -q --no-header -p no:cacheprovider --tb=no -rf
+SHORT   := --no-header -p no:cacheprovider --tb=no -rf
 
 .PHONY: setup stage-0 stage-2 stage-2-counterexample stage-3 test spec-check clean
 
@@ -16,9 +16,9 @@ stage-2:          ## all tests, one line per failure
 	-$(PYTEST) $(SHORT) tests
 
 stage-2-counterexample:  ## the shrunk counterexample from Hypothesis
-	-$(PYTEST) -q --no-header -p no:cacheprovider --tb=short -rN \
+	-$(PYTEST) --no-header -p no:cacheprovider --tb=short -rN \
 	  tests/test_spec_properties.py::test_next_pack_goes_to_largest_eligible_shortfall \
-	  2>&1 | grep -A6 'Falsifying\|Failing test case'
+	  2>&1 | sed -n '/AssertionError/p; /Failing test case/,/^E   )/p'
 
 stage-3:          ## all tests, expected to pass
 	$(PYTEST) $(SHORT) tests

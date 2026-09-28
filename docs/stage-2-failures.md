@@ -21,9 +21,10 @@ FAILED tests/test_spec_rules.py::test_rejects_empty_curve - Failed: DID NOT R...
 FAILED tests/test_spec_rules.py::test_rejects_negative_ratio - ZeroDivisionEr...
 FAILED tests/test_spec_rules.py::test_rejects_curve_with_no_positive_ratio - ...
 FAILED tests/test_spec_rules.py::test_first_failing_check_is_the_reason_given
+8 failed, 17 passed
 ```
 
-8 failed, 17 passed. The 5 stage-0 example tests still pass.
+The 5 stage-0 example tests still pass.
 
 ## What failed and why
 
