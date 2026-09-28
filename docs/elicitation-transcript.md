@@ -142,16 +142,36 @@ Options:
 **Decided by Claude: keep both.** The general impossibility result (Balinski
 and Young) concerns ratios that change between runs. Here the curve is fixed
 and only the order size changes, and in that setting both properties can be
-had at once. The **quota method** (Balinski and Young, 1975) places packs one at
-a time. Each pack goes to the size with the strongest claim, `ratio ÷ (packs so
-far + 1)`, among the sizes that would not go above their exact share rounded
-up. Because each larger order only adds packs to the smaller one's result, no
-size can lose. The upper-quota filter, plus the method's proof, keeps every size
-within one pack. Invariant `WithinOnePackOfExactShare`, rule `PlaceNextPack`.
+had at once, by placing packs one at a time: each larger order only adds packs
+to the smaller one's result, so no size can lose one.
 
-The cost: the method is less obvious than largest remainder, and for some
-orders it gives a different, equally valid answer. On the five hand-picked
-examples in `tests/test_examples.py` both methods agree.
+**Revised after stage 2.** The first version of the spec used Balinski and
+Young's quota method, which gives each pack to the size with the largest
+`ratio ÷ (packs so far + 1)`. When the generated tests ran at stage 2,
+Hypothesis shrank a failure to curve 2:1 with 2 packs. The naive code gave 1/1,
+but that method gave 2/0. Both are within one pack of the exact shares (1.33
+and 0.67), but 1/1 is plainly closer. The method favours large sizes.
+
+Claude then checked three alternatives by brute force over every curve with
+up to 4 or 5 sizes, ratios 0-6 or 0-7, and up to 40-50 packs:
+
+| Method | Within one pack | Never loses a pack | 2:1 at 2 packs |
+|---|---|---|---|
+| Quota method, `ratio ÷ (packs + 1)` (first version) | always (proven) | always | 2/0 |
+| Quota method, `ratio ÷ (packs + ½)` (Webster) | fails, e.g. 1:1:1:3 at 4 packs | always | 1/1 |
+| Next pack to the largest shortfall | fails in 5 of 1.87M cases, e.g. 1:1:1:6:6 at 10 packs | always | 1/1 |
+| Largest shortfall plus Still's eligibility check | always (proven, and no failures found) | always | 1/1 |
+
+The spec now uses the last one. Pack number *n* goes to the size furthest
+below its exact share of *n* packs, among sizes that are eligible. A size is
+eligible if taking the pack keeps it no more than its share rounded up, and
+still lets every size reach its share rounded down at every later total.
+Rule `PlaceNextPack`, invariants `WithinOnePackOfExactShare` and
+`LargerOrderNeverTakesPacksAway`.
+
+The cost: the eligibility check is harder to explain than largest remainder,
+and for some orders the answer differs from largest remainder's. On the five
+hand-picked examples in `tests/test_examples.py` both methods agree.
 
 ---
 
@@ -167,9 +187,9 @@ not a measurable rule on its own, so the spec replaces it with these.
 
 Options: floating point; exact whole-number arithmetic.
 
-**Decided by Claude: exact.** The spec compares claims by cross-multiplying
-(`beats`) and compares shares scaled by the total ratio, so no division or
-rounding is ever needed. Floating-point shares are what make the naive
+**Decided by Claude: exact.** The spec compares every share scaled by the
+total ratio (`shortfall`, `scaled_share`), so only whole numbers are compared
+and no rounding error can creep in. Floating-point shares are what make the naive
 version's tie-breaking unreliable.
 
 ---

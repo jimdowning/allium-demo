@@ -96,12 +96,15 @@ entity AllocationLine {
     scaled_share: allocation.total_packs * ratio
     scaled_packs: packs * allocation.total_ratio
 
-    -- The claim of this line on the next pack is ratio / (packs + 1).
-    -- beats(other) compares claims by cross-multiplying, so no division or
-    -- rounding is involved. Equal claims go to the size earlier in the curve.
-    beats(other):
-        ratio * (other.packs + 1) > other.ratio * (packs + 1)
-        or (ratio * (other.packs + 1) = other.ratio * (packs + 1)
+    -- How far this size is below its exact share of `total` packs, scaled
+    -- by total_ratio to stay in whole numbers.
+    shortfall(total): total * ratio - packs * allocation.total_ratio
+
+    -- beats(other, total): this size has the larger shortfall at `total`
+    -- packs. Equal shortfalls go to the size earlier in the curve.
+    beats(other, total):
+        shortfall(total) > other.shortfall(total)
+        or (shortfall(total) = other.shortfall(total)
             and position < other.position)
 }
 
@@ -140,17 +143,31 @@ rule StartAllocation {
         NextPackDue(allocation: allocation)
 }
 
--- Packs are placed one at a time. Pack number n goes to the size with the
--- strongest claim among the sizes that would not end up above their exact
--- share of n packs rounded up. This is the Balinski-Young quota method.
+-- Packs are placed one at a time, so a larger order only ever adds packs.
+-- Pack number n goes to the eligible size furthest below its exact share of
+-- n packs. A size is eligible when both hold:
+--   1. After taking the pack it is still no more than its exact share of n
+--      packs rounded up.
+--   2. Taking the pack leaves every size able to reach its exact share
+--      rounded down at every later total. keeps_shares_reachable checks
+--      this for each later total t from n to n + total_ratio: the packs the
+--      sizes are still owed at t (share at t rounded down, minus packs held,
+--      counting the pack just given, never below 0) add up to no more than
+--      t - n.
+-- This is Still's quota method (Still, 1979) with a largest-shortfall
+-- priority. It keeps every size within one pack of its exact share and
+-- never takes a pack away as the order grows.
 rule PlaceNextPack {
     when: NextPackDue(allocation)
     requires: allocation.placed_packs < allocation.total_packs
     let n = allocation.placed_packs + 1
-    let eligible = allocation.lines where ratio > 0 and packs * allocation.total_ratio < n * ratio
-    let chosen = strongest_claim(eligible)
+    let eligible = allocation.lines
+        where ratio > 0
+        and packs * allocation.total_ratio < n * ratio
+        and keeps_shares_reachable(allocation, size, n)
+    let chosen = largest_shortfall(eligible, n)
     requires: chosen in eligible
-    requires: eligible.all(o => o = chosen or chosen.beats(o))
+    requires: eligible.all(o => o = chosen or chosen.beats(o, n))
     ensures:
         chosen.packs = chosen.packs + 1
         allocation.placed_packs = n
