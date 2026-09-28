@@ -160,7 +160,7 @@ up to 4 or 5 sizes, ratios 0-6 or 0-7, and up to 40-50 packs:
 | Quota method, `ratio ÷ (packs + 1)` (first version) | always (proven) | always | 2/0 |
 | Quota method, `ratio ÷ (packs + ½)` (Webster) | fails, e.g. 1:1:1:3 at 4 packs | always | 1/1 |
 | Next pack to the largest shortfall | fails in 5 of 1.87M cases, e.g. 1:1:1:6:6 at 10 packs | always | 1/1 |
-| Largest shortfall plus Still's eligibility check | always (proven, and no failures found) | always | 1/1 |
+| Largest shortfall plus Still's eligibility check | always (proven; 0 failures in 784,080 cases) | always | 1/1 |
 
 The spec now uses the last one. Pack number *n* goes to the size furthest
 below its exact share of *n* packs, among sizes that are eligible. A size is
