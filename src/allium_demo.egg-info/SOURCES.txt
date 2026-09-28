@@ -1,0 +1,6 @@
+pyproject.toml
+src/allium_demo.egg-info/PKG-INFO
+src/allium_demo.egg-info/SOURCES.txt
+src/allium_demo.egg-info/dependency_links.txt
+src/allium_demo.egg-info/requires.txt
+src/allium_demo.egg-info/top_level.txt
