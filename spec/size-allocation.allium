@@ -1,0 +1,256 @@
+-- allium: 3
+-- size-allocation.allium
+
+-- Scope: Allocating one style order across sizes, in whole packs, in
+--        proportion to the style's size curve.
+-- Includes: validating the request, the allocation method, the result
+--           returned to the caller.
+-- Excludes:
+--   - Placing, amending or cancelling orders (the ordering system owns these)
+--   - Maintaining size curves and pack sizes (master data, supplied)
+--   - Minimum packs per size (not required; see docs/elicitation-transcript.md)
+-- The calculation is a pure function of its three inputs: the same order
+-- units, size curve and pack size always give the same allocation.
+
+------------------------------------------------------------
+-- External Entities
+------------------------------------------------------------
+
+-- One size in a style's size curve, e.g. M with ratio 2.
+-- position is the size's place in the curve as supplied (0 = first).
+-- Curve order matters: it breaks ties (see PlaceNextPack).
+external entity CurveSize {
+    request: AllocationRequest
+    size: String
+    ratio: Integer
+    position: Integer
+}
+
+-- What the ordering system asks us to allocate.
+external entity AllocationRequest {
+    order_units: Integer
+    pack_size: Integer
+    curve: CurveSize with request = this
+
+    total_ratio: sum(curve, c => c.ratio)
+    has_whole_packs: remainder(order_units, pack_size) = 0
+    has_duplicate_sizes: curve.any(a => curve.any(b => a != b and a.size = b.size))
+
+    -- Checks run in this order; the first failing check is the reason given.
+    rejection_reason:
+        if pack_size < 1: invalid_pack_size
+        else if order_units < 0: negative_order
+        else if curve.count = 0: empty_curve
+        else if has_duplicate_sizes: duplicate_size
+        else if curve.any(c => c.ratio < 0): negative_ratio
+        else if total_ratio = 0: no_positive_ratio
+        else if not has_whole_packs: part_pack_order
+        else: none
+
+    is_allocatable: rejection_reason = none
+}
+
+external entity OrderingSystem {}
+
+------------------------------------------------------------
+-- Enumerations
+------------------------------------------------------------
+
+enum RejectionReason {
+    invalid_pack_size | negative_order | empty_curve | duplicate_size
+    | negative_ratio | no_positive_ratio | part_pack_order | none
+}
+
+------------------------------------------------------------
+-- Entities and Variants
+------------------------------------------------------------
+
+entity Allocation {
+    request: AllocationRequest
+    total_packs: Integer
+    placed_packs: Integer
+    lines: AllocationLine with allocation = this
+
+    total_ratio: request.total_ratio
+    allocated_packs: sum(lines, l => l.packs)
+    allocated_units: allocated_packs * request.pack_size
+    is_complete: placed_packs = total_packs
+
+    invariant PlacedPacksAreAllocated {
+        allocated_packs = placed_packs
+    }
+}
+
+-- One line of the result per size in the curve, zero-ratio sizes included.
+entity AllocationLine {
+    allocation: Allocation
+    size: String
+    ratio: Integer
+    position: Integer
+    packs: Integer
+
+    units: packs * allocation.request.pack_size
+
+    -- Exact proportional share of packs is total_packs * ratio / total_ratio.
+    -- Scaled by total_ratio to stay in whole numbers:
+    scaled_share: allocation.total_packs * ratio
+    scaled_packs: packs * allocation.total_ratio
+
+    -- The claim of this line on the next pack is ratio / (packs + 1).
+    -- beats(other) compares claims by cross-multiplying, so no division or
+    -- rounding is involved. Equal claims go to the size earlier in the curve.
+    beats(other):
+        ratio * (other.packs + 1) > other.ratio * (packs + 1)
+        or (ratio * (other.packs + 1) = other.ratio * (packs + 1)
+            and position < other.position)
+}
+
+entity AllocationRejection {
+    request: AllocationRequest
+    reason: RejectionReason
+}
+
+------------------------------------------------------------
+-- Rules
+------------------------------------------------------------
+
+rule RejectRequest {
+    when: AllocationRequested(_, request)
+    requires: not request.is_allocatable
+    ensures: AllocationRejection.created(request: request, reason: request.rejection_reason)
+}
+
+rule StartAllocation {
+    when: AllocationRequested(_, request)
+    requires: request.is_allocatable
+    ensures:
+        let allocation = Allocation.created(
+            request: request,
+            total_packs: request.order_units / request.pack_size,
+            placed_packs: 0
+        )
+        for c in request.curve:
+            AllocationLine.created(
+                allocation: allocation,
+                size: c.size,
+                ratio: c.ratio,
+                position: c.position,
+                packs: 0
+            )
+        NextPackDue(allocation: allocation)
+}
+
+-- Packs are placed one at a time. Pack number n goes to the size with the
+-- strongest claim among the sizes that would not end up above their exact
+-- share of n packs rounded up. This is the Balinski-Young quota method.
+rule PlaceNextPack {
+    when: NextPackDue(allocation)
+    requires: allocation.placed_packs < allocation.total_packs
+    let n = allocation.placed_packs + 1
+    let eligible = allocation.lines where ratio > 0 and packs * allocation.total_ratio < n * ratio
+    let chosen = strongest_claim(eligible)
+    requires: chosen in eligible
+    requires: eligible.all(o => o = chosen or chosen.beats(o))
+    ensures:
+        chosen.packs = chosen.packs + 1
+        allocation.placed_packs = n
+        NextPackDue(allocation: allocation)
+}
+
+------------------------------------------------------------
+-- Invariants
+------------------------------------------------------------
+
+-- Allocated units equal the order exactly. Orders that are not whole packs
+-- are rejected rather than rounded.
+invariant AllocatedUnitsMatchOrder {
+    for a in Allocations:
+        a.is_complete implies a.allocated_units = a.request.order_units
+}
+
+-- Every size in the curve appears exactly once in the result.
+invariant OneLinePerCurveSize {
+    for a in Allocations:
+        a.lines.count = a.request.curve.count
+}
+
+-- Within one pack: each size gets its exact share of packs rounded down or
+-- rounded up, never further away.
+invariant WithinOnePackOfExactShare {
+    for l in AllocationLines:
+        l.allocation.is_complete implies
+            l.scaled_packs - l.scaled_share < l.allocation.total_ratio
+            and l.scaled_share - l.scaled_packs < l.allocation.total_ratio
+}
+
+-- A size with ratio 0 never gets a pack.
+invariant ZeroRatioGetsNothing {
+    for l in AllocationLines:
+        l.ratio = 0 implies l.packs = 0
+}
+
+-- Monotonic: with the same curve and pack size, a larger order never gives
+-- any size fewer packs (no Alabama paradox).
+invariant LargerOrderNeverTakesPacksAway {
+    for a in Allocations:
+        for b in Allocations:
+            a.is_complete and b.is_complete
+            and same_curve(a.request, b.request)
+            and a.request.pack_size = b.request.pack_size
+            and a.total_packs <= b.total_packs
+            implies
+                for la in a.lines:
+                    for lb in b.lines:
+                        la.size = lb.size implies la.packs <= lb.packs
+}
+
+-- Deterministic: the same inputs give the same allocation.
+invariant SameInputsSameAllocation {
+    for a in Allocations:
+        for b in Allocations:
+            a.is_complete and b.is_complete
+            and same_curve(a.request, b.request)
+            and a.request.pack_size = b.request.pack_size
+            and a.request.order_units = b.request.order_units
+            implies
+                for la in a.lines:
+                    for lb in b.lines:
+                        la.size = lb.size implies la.packs = lb.packs
+}
+
+------------------------------------------------------------
+-- Actor Declarations
+------------------------------------------------------------
+
+actor Caller {
+    identified_by: OrderingSystem where true
+}
+
+------------------------------------------------------------
+-- Surfaces
+------------------------------------------------------------
+
+surface SizeAllocation {
+    facing caller: Caller
+
+    context allocation: Allocation where is_complete
+
+    exposes:
+        for line in allocation.lines:
+            line.size
+            line.packs
+            line.units
+        allocation.total_packs
+        allocation.allocated_units
+
+    provides:
+        AllocationRequested(caller, request)
+
+    @guarantee ResultInCurveOrder
+        -- Lines are returned in the order the sizes appear in the curve,
+        -- one per size, including sizes with ratio 0 (which get 0 packs).
+
+    @guarantee RejectionIsAnError
+        -- A rejected request returns no allocation. The caller is told the
+        -- RejectionReason and nothing is partly allocated.
+}
