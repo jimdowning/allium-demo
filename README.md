@@ -18,7 +18,7 @@ git tag:
 |---|---|
 | `stage-0-brief` | A developer implements the brief directly, using the obvious largest-remainder method, and writes five reasonable example tests. They pass. |
 | `stage-1-elicit` | The `allium:elicit` skill interviews the stakeholder about the brief and writes a formal spec (`spec/size-allocation.allium`). The questions and decisions are in `docs/elicitation-transcript.md`. |
-| `stage-2-propagate` | The `allium:propagate` skill generates property-based tests (Hypothesis) and unit tests from the spec. Run against the unchanged stage-0 code, 8 of 25 fail. See `docs/stage-2-failures.md`. |
+| `stage-2-propagate` | `allium plan` lists the 34 tests the spec requires, and the `allium:propagate` skill writes them as property-based tests (Hypothesis) and unit tests. Run against the unchanged stage-0 code, 8 of 25 fail. See `docs/propagate-transcript.md` and `docs/stage-2-failures.md`. |
 | `stage-3-fixed` | The code is rewritten to meet the spec. All 25 tests pass. See `docs/stage-3-pass.md`. |
 
 The point is not the allocation method. It is that:
@@ -47,6 +47,9 @@ Two honest notes:
 ```
 docs/brief.md                     the original brief, unchanged
 docs/elicitation-transcript.md    stage 1 questions and decisions
+docs/stage-2-plan.json            stage 2 `allium plan` output (34 test obligations)
+docs/stage-2-obligations.txt      the same, one line per obligation
+docs/propagate-transcript.md      stage 2 record of how the tests were generated
 docs/stage-2-failures.md          stage 2 test run, with the shrunk counterexample
 docs/stage-3-pass.md              stage 3 test run
 spec/size-allocation.allium       the spec
@@ -72,9 +75,9 @@ make test       # the tests in your current checkout
 `make setup` checks out each stage tag into its own git worktree under
 `.stages/`, so you can compare stages side by side without switching branches.
 
-If `git tag -l 'stage-*'` prints nothing (tags are not always copied when a
-repo is forked), run `./scripts/tag-stages.sh` to create them. Add `--push`
-to push them to your fork.
+The stage tags are on GitHub and come with a clone or fork. If
+`git tag -l 'stage-*'` prints nothing, run `./scripts/tag-stages.sh` to
+recreate them.
 
 To look at one stage in your own checkout instead:
 

@@ -1,0 +1,496 @@
+{
+  "diagnostics": [],
+  "obligations": [
+    {
+      "category": "entity_fields",
+      "description": "Verify all declared fields on CurveSize are present with correct types",
+      "detail": {
+        "fields": [
+          "request",
+          "size",
+          "ratio",
+          "position"
+        ]
+      },
+      "id": "entity-fields.CurveSize",
+      "source_construct": "CurveSize",
+      "source_span": {
+        "end": 1102,
+        "start": 984
+      }
+    },
+    {
+      "category": "entity_fields",
+      "description": "Verify all declared fields on AllocationRequest are present with correct types",
+      "detail": {
+        "fields": [
+          "order_units",
+          "pack_size",
+          "curve",
+          "total_ratio",
+          "has_whole_packs",
+          "has_duplicate_sizes",
+          "rejection_reason",
+          "is_allocatable"
+        ]
+      },
+      "id": "entity-fields.AllocationRequest",
+      "source_construct": "AllocationRequest",
+      "source_span": {
+        "end": 1983,
+        "start": 1153
+      }
+    },
+    {
+      "category": "entity_relationship",
+      "description": "Verify relationship AllocationRequest.curve navigates to the correct related entities",
+      "id": "entity-relationship.AllocationRequest.curve",
+      "source_construct": "AllocationRequest.curve",
+      "source_span": {
+        "end": 1983,
+        "start": 1153
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value AllocationRequest.has_whole_packs computes correctly",
+      "id": "derived.AllocationRequest.has_whole_packs",
+      "source_construct": "AllocationRequest.has_whole_packs",
+      "source_span": {
+        "end": 1983,
+        "start": 1153
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value AllocationRequest.is_allocatable computes correctly",
+      "id": "derived.AllocationRequest.is_allocatable",
+      "source_construct": "AllocationRequest.is_allocatable",
+      "source_span": {
+        "end": 1983,
+        "start": 1153
+      }
+    },
+    {
+      "category": "enum_comparable",
+      "description": "Verify fields typed with enum RejectionReason are comparable",
+      "id": "enum-comparable.RejectionReason",
+      "source_construct": "RejectionReason",
+      "source_span": {
+        "end": 2319,
+        "start": 2159
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant PlacedPacksAreAllocated holds after any field mutation on Allocation",
+      "expression": "allocated_packs = placed_packs",
+      "id": "invariant.Allocation.PlacedPacksAreAllocated",
+      "source_construct": "Allocation.PlacedPacksAreAllocated",
+      "source_span": {
+        "end": 2890,
+        "start": 2810
+      }
+    },
+    {
+      "category": "entity_fields",
+      "description": "Verify all declared fields on Allocation are present with correct types",
+      "detail": {
+        "fields": [
+          "request",
+          "total_packs",
+          "placed_packs",
+          "lines",
+          "total_ratio",
+          "allocated_packs",
+          "allocated_units",
+          "is_complete"
+        ]
+      },
+      "id": "entity-fields.Allocation",
+      "source_construct": "Allocation",
+      "source_span": {
+        "end": 2892,
+        "start": 2469
+      }
+    },
+    {
+      "category": "entity_relationship",
+      "description": "Verify relationship Allocation.lines navigates to the correct related entities",
+      "id": "entity-relationship.Allocation.lines",
+      "source_construct": "Allocation.lines",
+      "source_span": {
+        "end": 2892,
+        "start": 2469
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value Allocation.allocated_units computes correctly",
+      "id": "derived.Allocation.allocated_units",
+      "source_construct": "Allocation.allocated_units",
+      "source_span": {
+        "end": 2892,
+        "start": 2469
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value Allocation.is_complete computes correctly",
+      "id": "derived.Allocation.is_complete",
+      "source_construct": "Allocation.is_complete",
+      "source_span": {
+        "end": 2892,
+        "start": 2469
+      }
+    },
+    {
+      "category": "entity_fields",
+      "description": "Verify all declared fields on AllocationLine are present with correct types",
+      "detail": {
+        "fields": [
+          "allocation",
+          "size",
+          "ratio",
+          "position",
+          "packs",
+          "units",
+          "scaled_share",
+          "scaled_packs"
+        ]
+      },
+      "id": "entity-fields.AllocationLine",
+      "source_construct": "AllocationLine",
+      "source_span": {
+        "end": 3889,
+        "start": 2970
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value AllocationLine.units computes correctly",
+      "id": "derived.AllocationLine.units",
+      "source_construct": "AllocationLine.units",
+      "source_span": {
+        "end": 3889,
+        "start": 2970
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value AllocationLine.scaled_share computes correctly",
+      "id": "derived.AllocationLine.scaled_share",
+      "source_construct": "AllocationLine.scaled_share",
+      "source_span": {
+        "end": 3889,
+        "start": 2970
+      }
+    },
+    {
+      "category": "derived",
+      "description": "Verify derived value AllocationLine.scaled_packs computes correctly",
+      "id": "derived.AllocationLine.scaled_packs",
+      "source_construct": "AllocationLine.scaled_packs",
+      "source_span": {
+        "end": 3889,
+        "start": 2970
+      }
+    },
+    {
+      "category": "entity_fields",
+      "description": "Verify all declared fields on AllocationRejection are present with correct types",
+      "detail": {
+        "fields": [
+          "request",
+          "reason"
+        ]
+      },
+      "id": "entity-fields.AllocationRejection",
+      "source_construct": "AllocationRejection",
+      "source_span": {
+        "end": 3980,
+        "start": 3891
+      }
+    },
+    {
+      "category": "rule_success",
+      "dependencies": {
+        "entities_created": [
+          "AllocationRejection"
+        ],
+        "trigger_source": "external"
+      },
+      "description": "Verify rule RejectRequest succeeds when all preconditions are met",
+      "id": "rule-success.RejectRequest",
+      "source_construct": "RejectRequest",
+      "source_span": {
+        "end": 4312,
+        "start": 4114
+      }
+    },
+    {
+      "category": "rule_failure",
+      "dependencies": {
+        "entities_created": [
+          "AllocationRejection"
+        ],
+        "trigger_source": "external"
+      },
+      "description": "Verify rule RejectRequest is rejected when requires clause fails",
+      "id": "rule-failure.RejectRequest.1",
+      "source_construct": "RejectRequest",
+      "source_span": {
+        "end": 4217,
+        "start": 4181
+      }
+    },
+    {
+      "category": "rule_entity_creation",
+      "dependencies": {
+        "entities_created": [
+          "AllocationRejection"
+        ],
+        "trigger_source": "external"
+      },
+      "description": "Verify entity creation in rule RejectRequest ensures clause produces the specified fields",
+      "id": "rule-entity-creation.RejectRequest.1",
+      "source_construct": "RejectRequest",
+      "source_span": {
+        "end": 4310,
+        "start": 4222
+      }
+    },
+    {
+      "category": "rule_success",
+      "dependencies": {
+        "entities_created": [
+          "Allocation",
+          "AllocationLine"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "external"
+      },
+      "description": "Verify rule StartAllocation succeeds when all preconditions are met",
+      "id": "rule-success.StartAllocation",
+      "source_construct": "StartAllocation",
+      "source_span": {
+        "end": 4900,
+        "start": 4314
+      }
+    },
+    {
+      "category": "rule_failure",
+      "dependencies": {
+        "entities_created": [
+          "Allocation",
+          "AllocationLine"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "external"
+      },
+      "description": "Verify rule StartAllocation is rejected when requires clause fails",
+      "id": "rule-failure.StartAllocation.1",
+      "source_construct": "StartAllocation",
+      "source_span": {
+        "end": 4415,
+        "start": 4383
+      }
+    },
+    {
+      "category": "rule_success",
+      "dependencies": {
+        "entities_read": [
+          "Allocation"
+        ],
+        "entities_written": [
+          "Allocation"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "chained"
+      },
+      "description": "Verify rule PlaceNextPack succeeds when all preconditions are met",
+      "id": "rule-success.PlaceNextPack",
+      "source_construct": "PlaceNextPack",
+      "source_span": {
+        "end": 6394,
+        "start": 5784
+      }
+    },
+    {
+      "category": "rule_failure",
+      "dependencies": {
+        "entities_read": [
+          "Allocation"
+        ],
+        "entities_written": [
+          "Allocation"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "chained"
+      },
+      "description": "Verify rule PlaceNextPack is rejected when requires clause fails",
+      "id": "rule-failure.PlaceNextPack.1",
+      "source_construct": "PlaceNextPack",
+      "source_span": {
+        "end": 5901,
+        "start": 5843
+      }
+    },
+    {
+      "category": "rule_failure",
+      "dependencies": {
+        "entities_read": [
+          "Allocation"
+        ],
+        "entities_written": [
+          "Allocation"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "chained"
+      },
+      "description": "Verify rule PlaceNextPack is rejected when requires clause fails",
+      "id": "rule-failure.PlaceNextPack.2",
+      "source_construct": "PlaceNextPack",
+      "source_span": {
+        "end": 6193,
+        "start": 6165
+      }
+    },
+    {
+      "category": "rule_failure",
+      "dependencies": {
+        "entities_read": [
+          "Allocation"
+        ],
+        "entities_written": [
+          "Allocation"
+        ],
+        "trigger_emissions": [
+          "NextPackDue"
+        ],
+        "trigger_source": "chained"
+      },
+      "description": "Verify rule PlaceNextPack is rejected when requires clause fails",
+      "id": "rule-failure.PlaceNextPack.3",
+      "source_construct": "PlaceNextPack",
+      "source_span": {
+        "end": 6259,
+        "start": 6198
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant AllocatedUnitsMatchOrder holds after every state-changing rule that touches constrained entities",
+      "expression": "for a in Allocations:\n        a.is_complete implies a.allocated_units = a.request.order_units",
+      "id": "invariant.AllocatedUnitsMatchOrder",
+      "source_construct": "AllocatedUnitsMatchOrder",
+      "source_span": {
+        "end": 6782,
+        "start": 6646
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant OneLinePerCurveSize holds after every state-changing rule that touches constrained entities",
+      "expression": "for a in Allocations:\n        a.lines.count = a.request.curve.count",
+      "id": "invariant.OneLinePerCurveSize",
+      "source_construct": "OneLinePerCurveSize",
+      "source_span": {
+        "end": 6952,
+        "start": 6847
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant WithinOnePackOfExactShare holds after every state-changing rule that touches constrained entities",
+      "expression": "for l in AllocationLines:\n        l.allocation.is_complete implies\n            l.scaled_packs - l.scaled_share < l.allocation.total_ratio\n            and l.scaled_share - l.scaled_packs < l.allocation.total_ratio",
+      "id": "invariant.WithinOnePackOfExactShare",
+      "source_construct": "WithinOnePackOfExactShare",
+      "source_span": {
+        "end": 7321,
+        "start": 7065
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant ZeroRatioGetsNothing holds after every state-changing rule that touches constrained entities",
+      "expression": "for l in AllocationLines:\n        l.ratio = 0 implies l.packs = 0",
+      "id": "invariant.ZeroRatioGetsNothing",
+      "source_construct": "ZeroRatioGetsNothing",
+      "source_span": {
+        "end": 7469,
+        "start": 7365
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant LargerOrderNeverTakesPacksAway holds after every state-changing rule that touches constrained entities",
+      "expression": "for a in Allocations:\n        for b in Allocations:\n            a.is_complete and b.is_complete\n            and same_curve(a.request, b.request)\n            and a.request.pack_size = b.request.pack_size\n            and a.total_packs <= b.total_packs\n            implies\n                for la in a.lines:\n                    for lb in b.lines:\n                        la.size = lb.size implies la.packs <= lb.packs",
+      "id": "invariant.LargerOrderNeverTakesPacksAway",
+      "source_construct": "LargerOrderNeverTakesPacksAway",
+      "source_span": {
+        "end": 8056,
+        "start": 7593
+      }
+    },
+    {
+      "category": "invariant",
+      "description": "Verify invariant SameInputsSameAllocation holds after every state-changing rule that touches constrained entities",
+      "expression": "for a in Allocations:\n        for b in Allocations:\n            a.is_complete and b.is_complete\n            and same_curve(a.request, b.request)\n            and a.request.pack_size = b.request.pack_size\n            and a.request.order_units = b.request.order_units\n            implies\n                for la in a.lines:\n                    for lb in b.lines:\n                        la.size = lb.size implies la.packs = lb.packs",
+      "id": "invariant.SameInputsSameAllocation",
+      "source_construct": "SameInputsSameAllocation",
+      "source_span": {
+        "end": 8589,
+        "start": 8118
+      }
+    },
+    {
+      "category": "surface_actor",
+      "description": "Verify surface SizeAllocation is accessible only to the specified actor",
+      "id": "surface-actor.SizeAllocation",
+      "source_construct": "SizeAllocation",
+      "source_span": {
+        "end": 9641,
+        "start": 8934
+      }
+    },
+    {
+      "category": "surface_exposure",
+      "description": "Verify each exposed item on SizeAllocation is accessible",
+      "detail": {
+        "items": [
+          "total_packs",
+          "allocated_units"
+        ],
+        "surface": "SizeAllocation"
+      },
+      "id": "surface-exposure.SizeAllocation",
+      "source_construct": "SizeAllocation",
+      "source_span": {
+        "end": 9224,
+        "start": 9044
+      }
+    },
+    {
+      "category": "surface_provides",
+      "description": "Verify provided operations on SizeAllocation appear/hide based on when conditions",
+      "id": "surface-provides.SizeAllocation",
+      "source_construct": "SizeAllocation",
+      "source_span": {
+        "end": 9284,
+        "start": 9230
+      }
+    }
+  ],
+  "version": 3
+}
