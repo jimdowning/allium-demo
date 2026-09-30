@@ -45,8 +45,9 @@ Links: [brief](https://github.com/jimdowning/allium-demo/blob/stage-0-brief/docs
 [naive `allocate`](https://github.com/jimdowning/allium-demo/blob/stage-0-brief/src/allocation.py#L9-L27) ·
 [example tests](https://github.com/jimdowning/allium-demo/blob/stage-0-brief/tests/test_examples.py)
 
-Say: "This is what you get from a good developer working straight from the
-brief: sensible code, sensible tests, all green."
+Say: "This is what you get from a competent developer who codes straight from
+the brief without stopping to clarify it: sensible code, sensible tests, all
+green."
 
 ## Stage 1: elicitation (1 min)
 
@@ -67,9 +68,9 @@ Links: [elicitation transcript](https://github.com/jimdowning/allium-demo/blob/s
 [spec](https://github.com/jimdowning/allium-demo/blob/stage-1-elicit/spec/size-allocation.allium) ·
 [invariant `WithinOnePackOfExactShare`](https://github.com/jimdowning/allium-demo/blob/stage-1-elicit/spec/size-allocation.allium#L194-L201)
 
-Say: "Before looking at the code, the elicit skill went through the brief
-against a checklist of decisions briefs usually leave out, and each answer
-became a line in the spec."
+Say: "This is the clarifying a good developer does before writing code, done
+systematically: the elicit skill checked the brief against the decisions briefs
+usually leave out, and each answer became a line in the spec."
 
 ## Stage 2: tests generated from the spec (2.5 min)
 
