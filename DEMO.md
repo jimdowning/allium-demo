@@ -30,8 +30,11 @@ enough for about 90 columns.
 
 ```
 stage stage-0-brief
+echo; echo "=== The brief: docs/brief.md ==="; echo
 cat docs/brief.md
+echo; echo "=== The naive allocate(): src/allocation.py ==="; echo
 sed -n '9,27p' src/allocation.py
+echo; echo "=== The example tests ==="; echo
 t tests/test_examples.py
 ```
 
@@ -93,20 +96,27 @@ to the one Python function), and the obligation-to-test table ending in
 **Step 3: one Hypothesis test, next to the spec line it came from.**
 
 ```
-sed -n '194,201p' spec/size-allocation.allium        # the invariant
-sed -n '25,33p' tests/test_spec_properties.py        # the test generated from it
-sed -n '16,27p' tests/spec_support.py                # how Hypothesis makes inputs
+echo; echo "=== The invariant: spec/size-allocation.allium ==="; echo
+sed -n '194,201p' spec/size-allocation.allium
+echo; echo "=== The test generated from it: tests/test_spec_properties.py ==="; echo
+sed -n '25,33p' tests/test_spec_properties.py
+echo; echo "=== How Hypothesis makes inputs: tests/spec_support.py ==="; echo
+sed -n '16,27p' tests/spec_support.py
+echo; echo "=== The function under test, still naive: src/allocation.py ==="; echo
+sed -n '9,27p' src/allocation.py
 ```
 
 Point out that the test does not list any cases. `@given` asks Hypothesis for
 random valid curves (1-6 sizes, ratios 0-6), pack sizes and order sizes, and
 checks the invariant on each one. The function under test is still the naive
-one from stage 0: `sed -n '9,27p' src/allocation.py`.
+one from stage 0.
 
 **Step 4: run them against the unchanged stage-0 code.**
 
 ```
-make -s stage-2
+echo; echo "=== All tests against the naive code ==="; echo
+make -s stage-2 2>/dev/null
+echo; echo "=== Hypothesis's shrunk counterexample ==="; echo
 make -s stage-2-counterexample
 ```
 
@@ -140,8 +150,11 @@ testing didn't hit such a case. We reported that rather than tuning the test.
 
 ```
 stage stage-3-fixed
+echo; echo "=== Files changed from stage 2 to stage 3 ==="; echo
 git diff --stat stage-2-propagate stage-3-fixed
+echo; echo "=== The new allocate(): src/allocation.py ==="; echo
 sed -n '26,34p' src/allocation.py
+echo; echo "=== All tests against the fixed code ==="; echo
 make -s stage-3
 ```
 
